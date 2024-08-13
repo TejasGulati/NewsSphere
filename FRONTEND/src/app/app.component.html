@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sphere - Latest News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles here */
+        body, html {
+    height: 100%;
+    margin: 0;
+    font-size: 1rem; /* Medium base font size */
+}
+
+.navbar {
+    background-color: #405D72;
+    padding: 1rem 1.5rem; /* Medium padding */
+}
+
+.navbar .nav-link, .navbar .navbar-brand {
+    color: #FFF8F3;
+    font-size: 1.3rem; /* Medium font size */
+}
+
+.navbar .nav-link:hover, .navbar .navbar-brand:hover {
+    color: #758694;
+}
+
+.news-card {
+    margin-bottom: 15px; /* Medium margin for card spacing */
+}
+
+.news-card .card {
+    background-color: #F7E7DC;
+    border: none;
+    height: 100%;
+}
+
+.footer {
+    background-color: #405D72;
+    color: #FFF8F3;
+    padding: 0.8rem 1.5rem; /* Medium padding */
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.2rem; /* Medium font size */
+}
+
+.btn-light {
+    background: #FFF8F3;
+    color: #405D72;
+    border: none;
+    font-size: 1.2rem; /* Medium font size */
+    padding: 15px 30px; /* Medium padding */
+    border-radius: 0.4rem; /* Medium rounded corners */
+    min-width: 200px; /* Medium minimum width */
+    position: relative;
+    z-index: 2;
+}
+
+.btn-light:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    color: #FFF8F3;
+}
+
+.call-to-action {
+    background-color: white;
+    color: #405D72;
+    padding: 80px 1.5rem; /* Medium padding */
+    text-align: center;
+    background: linear-gradient(to bottom right, #F7E7DC, #FFF8F3);
+}
+
+.call-to-action h2 {
+    color: #405D72;
+    font-size: 3.5rem; /* Medium font size */
+}
+
+.call-to-action .btn-light {
+    background-color: #405D72;
+    color: #FFF8F3;
+    font-size: 1.2rem; /* Medium font size */
+    padding: 15px 30px; /* Medium padding */
+    border-radius: 0.4rem;
+    min-width: 200px;
+}
+
+.call-to-action .btn-light:hover {
+    background-color: #758694;
+    color: #FFF8F3;
+}
+
+.container-fullwidth {
+    width: 100%;
+    padding: 0;
+}
+
+.dashboard-container {
+    text-align: center;
+    padding: 15px; /* Medium padding */
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-container h1 {
+    color: #405D72;
+    font-size: 3rem; /* Medium font size */
+}
+
+.dashboard-container h2 {
+    color: #758694;
+    font-size: 2.5rem; /* Medium font size */
+}
+
+.dashboard-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.dashboard-container li {
+    background: #FFF8F3;
+    margin: 4px 0;
+    padding: 12px; /* Medium padding */
+    border-radius: 5px;
+    font-size: 1.2rem; /* Medium font size */
+}
+
+.logout-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.2rem; /* Medium font size */
+    z-index: 2;
+}
+
+.hero-section {
+    position: relative;
+    background-image: url('../assets/img.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 80px 0; /* Medium padding */
+    height: 70vh; /* Medium height */
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.hero-section h1, .hero-section p {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section h1 {
+    font-size: 4rem; /* Medium font size */
+    font-weight: bold;
+}
+
+.hero-section p {
+    font-size: 1.5rem; /* Medium font size */
+}
+
+.feature-box {
+    padding: 45px 0; /* Medium padding */
+}
+
+.feature-card {
+    background-color: #F7E7DC;
+    border: none;
+    border-radius: 0.4rem; /* Medium rounded corners */
+    padding: 18px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Medium shadow */
+    margin-bottom: 15px; /* Medium spacing between cards */
+}
+
+.feature-card .feature-icon {
+    font-size: 4rem; /* Medium icon size */
+    color: #405D72;
+    margin-bottom: 15px; /* Medium space below the icon */
+}
+
+.feature-card h3 {
+    font-size: 2.5rem; /* Medium font size */
+    color: #405D72;
+    margin-bottom: 12px; /* Medium space below the heading */
+}
+
+.feature-card p {
+    font-size: 1.3rem; /* Medium font size */
+    color: #758694;
+}
+
+
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg" *ngIf="!isArticleDetailRoute && !isDashboardRoute && !isArticlesRoute && !isBookmarksRoute && !isCategoryRoute">
+    <div class="container">
+        <a class="navbar-brand" href="#">NewsSphere</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" routerLink="/register">Register</a>
+            <a class="nav-link" routerLink="/login">Login</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section text-center" *ngIf="!isArticleDetailRoute && !isDashboardRoute && !isAuthRoute && !isArticlesRoute && !isBookmarksRoute && !isCategoryRoute">
+    <div class="container">
+        <h1>Welcome to NewsSphere</h1>
+        <p>Your go-to platform for the latest news and insightful articles.</p>
+        <a class="btn btn-light mt-3 mx-2" routerLink="/register">Register</a>
+        <a class="btn btn-light mt-3 mx-2" routerLink="/login">Login</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="feature-box text-center" *ngIf="!isArticleDetailRoute && !isDashboardRoute && !isAuthRoute && !isArticlesRoute && !isBookmarksRoute && !isCategoryRoute" >
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <h3>Latest Articles</h3>
+                    <p>Stay updated with the most recent articles from various sources.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Get in-depth analysis and trends from the news you read.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h3>User Interaction</h3>
+                    <p>Engage with content and interact with a community of readers.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Router Outlet -->
+<router-outlet></router-outlet>
+
+<!-- Footer -->
+<footer class="footer" *ngIf="!isArticleDetailRoute && !isDashboardRoute && !isArticlesRoute && !isBookmarksRoute && !isCategoryRoute">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>About NewsSphere</h5>
+                <p>NewsSphere is a news aggregation and analysis platform that provides real-time updates, user interactions, personalized recommendations, and advanced analytics through a robust web application.</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact</h5>
+                <p>Email: support@newssphere.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Follow Us</h5>
+                <a href="#" class="text-light me-3">Facebook</a>
+                <a href="#" class="text-light me-3">Twitter</a>
+                <a href="#" class="text-light">Instagram</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

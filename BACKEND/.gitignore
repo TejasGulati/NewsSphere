@@ -1,0 +1,59 @@
+# Python cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# pytest cache
+.pytest_cache/
+
+# Celerybeat schedule
+celerybeat-schedule.db
+
+# Redis dump
+dump.rdb
+
+# SQLite database
+news_cache.sqlite
+
+# Virtual environment
+venv/
+
+# Django-specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+
+# Angular-specific
+node_modules/
+dist/
+*.log
+
+# Environment files
+.env
+.env.*
+.venv
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build files
+*.tgz
+*.gz
+*.zip
+
+# Miscellaneous
+*.bak
+*.tmp
+*.orig

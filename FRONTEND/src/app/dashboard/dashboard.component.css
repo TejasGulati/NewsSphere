@@ -1,0 +1,213 @@
+html, body {
+  height: 100%; /* Ensure the body and html cover the full height */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+body {
+  background-color: #FFF8F3; /* Light background color */
+  background-image: url('../../assets/img.png'); /* Adjust path if needed */
+  background-size: cover; /* Makes the image cover the entire body */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents repeating the image */
+  background-attachment: fixed; /* Keeps the background image fixed during scrolling */
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  min-height: 100vh; /* Ensure the body covers the full viewport height */
+  overflow: hidden; /* Prevents any overflow issues */
+}
+
+/* Dashboard container styling */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto; /* Add top and bottom margins */
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for the container */
+  border-radius: 10px; /* Slightly increase border-radius */
+}
+
+/* Header styles */
+.welcome-insight-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px; /* Increase gap between sections */
+  margin-bottom: 40px; /* Increase bottom margin */
+}
+
+.welcome-section {
+  flex: 1;
+  background-color: #FFF8F3;
+  padding: 25px; /* Increase padding */
+  border-radius: 10px; /* Increase border-radius */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increase shadow */
+}
+
+.insight-section {
+  flex: 1;
+  background-color: #405D72;
+  color: white;
+  padding: 25px; /* Increase padding */
+  border-radius: 10px; /* Increase border-radius */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increase shadow */
+  text-align: center;
+}
+
+/* Heading styles */
+h1, h2, h3 {
+  margin: 0; /* Remove default margins for headings */
+}
+
+h1 {
+  color: #405D72;
+  font-size: 2.5rem; /* Maintain font size */
+  margin-bottom: 20px; /* Increase bottom margin */
+  font-weight: bold;
+}
+
+h2 {
+  color: white;
+  font-size: 2rem; /* Maintain font size */
+  margin-bottom: 25px; /* Increase bottom margin */
+  font-weight: bold;
+}
+
+h3 {
+  color: #405D72;
+  font-size: 1.75rem; /* Maintain font size */
+  margin-bottom: 20px; /* Increase bottom margin */
+  font-weight: bold;
+}
+
+/* Welcome message */
+.welcome-message {
+  font-size: 2rem; /* Maintain font size */
+  color: #758694;
+  font-weight: bold;
+  margin: 0;
+  padding: 20px; /* Increase padding */
+}
+
+/* Statistics */
+.stat-item {
+  margin-bottom: 30px; /* Increase bottom margin */
+}
+
+.stat-value {
+  font-size: 2rem; /* Maintain font size */
+  color: #FFF8F3;
+  display: block;
+  font-weight: bold;
+}
+
+.stat-label {
+  color: #C0D4E7;
+  font-size: 1.25rem; /* Increase font size */
+}
+
+/* Category buttons */
+.news-categories {
+  margin-bottom: 40px; /* Increase bottom margin */
+  text-align: center;
+}
+
+.category-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.category-buttons > .category-button {
+  flex: 1 1 auto;
+  max-width: 200px; /* Increase max-width for larger buttons */
+  margin: 0 15px; /* Increase spacing between buttons */
+}
+
+.category-buttons > .category-button:first-child {
+  margin-left: 0;
+}
+
+.category-buttons > .category-button:last-child {
+  margin-right: 0;
+}
+
+.category-buttons button {
+  background-color: #758694;
+  color: white;
+  border: none;
+  padding: 15px 40px; /* Increase padding */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem; /* Increase font size */
+  margin: 10px;
+}
+
+.category-buttons button:hover {
+  background-color: #405D72;
+}
+
+/* Articles section */
+.articles-container {
+  margin-bottom: 40px; /* Increase bottom margin */
+  text-align: center;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px; /* Increase gap between cards */
+  justify-content: center;
+}
+
+.card {
+  background-color: #FFF8F3;
+  padding: 25px; /* Increase padding */
+  border-radius: 10px; /* Increase border-radius */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increase shadow */
+  width: calc(33.333% - 30px); /* Adjust width considering the gap */
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.card-title {
+  color: #405D72;
+  font-size: 1.75rem; /* Increase font size */
+  margin-bottom: 15px; /* Increase bottom margin */
+  font-weight: bold;
+}
+
+.card-content {
+  color: #758694;
+  font-size: 1.1rem; /* Increase font size */
+}
+
+.card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px; /* Increase border-radius */
+  margin-bottom: 15px; /* Increase bottom margin */
+}
+
+/* Bookmark buttons */
+.bookmark-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Increase top margin */
+}
+
+.bookmark-button {
+  background-color: #758694;
+  color: white;
+  border: none;
+  padding: 15px 40px; /* Increase padding */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem; /* Increase font size */
+}
+
+.bookmark-button:hover {
+  background-color: #405D72;
+}
+
+.bookmarked {
+  background-color: #405D72;
+}

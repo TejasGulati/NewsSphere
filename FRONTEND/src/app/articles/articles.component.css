@@ -1,0 +1,287 @@
+html, body {
+  height: 100%; /* Ensure the body and html cover the full height */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+body {
+  background-color: #FFF8F3; /* Light background color */
+  background-image: url('../../assets/img.png'); /* Adjust path if needed */
+  background-size: cover; /* Makes the image cover the entire body */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents repeating the image */
+  background-attachment: fixed; /* Keeps the background image fixed during scrolling */
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  min-height: 100vh; /* Ensure the body covers the full viewport height */
+  overflow: hidden; /* Prevents any overflow issues */
+}
+
+/* Container for all articles */
+.articles-container {
+  max-width: 1200px;
+  margin:  auto;
+  margin-top: 40px;
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for a similar look */
+  border-radius: 12px;
+  min-height: 100vh; /* Ensure it takes up at least the viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header and filter container */
+.articles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #405D72; /* Blue background */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly larger shadow */
+  width: 100%; /* Make sure it spans the full width */
+}
+
+/* Heading styling */
+.articles-header h1 {
+  color: #FFF8F3; /* Light color for contrast */
+  font-size: 2.4rem; /* Slightly smaller for better balance */
+  margin: 0;
+  font-weight: 700; /* Bold text */
+  line-height: 1.2; /* Improve readability */
+}
+
+/* Category filter styling */
+.category-filter {
+  display: flex;
+  align-items: center;
+  background-color: #FFF8F3; /* Light background */
+  padding: 10px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  position: relative; /* Required for arrow positioning */
+}
+
+.category-filter select {
+  padding: 10px 40px 10px 10px; /* Added padding for the arrow */
+  font-size: 1.2rem;
+  border: 1px solid #405D72; /* Blue border */
+  border-radius: 6px; /* Rounded corners */
+  background-color: #FFF8F3; /* Match background */
+  color: #333; /* Dark text color */
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  appearance: none; /* Remove default arrow */
+  background: none; /* Remove background */
+}
+
+/* Custom arrow for the select dropdown */
+.category-filter::after {
+  content: '▼'; /* Unicode character for a downward arrow */
+  font-size: 1rem;
+  color: #405D72; /* Match the blue color */
+  position: absolute;
+  right: 15px; /* Position it inside the select */
+  pointer-events: none; /* Ensure it doesn't block the click */
+  margin-right: 10px;
+}
+
+.category-filter select:focus {
+  border-color: #758694; /* Lighter blue on focus */
+  background-color: #EAEAEA; /* Slightly darker background */
+  outline: none; /* Remove default outline */
+}
+
+/* Arrow styling for disabled state */
+.category-filter select:disabled::after {
+  color: #d0d0d0; /* Grey color for disabled state */
+}
+
+/* Loader container */
+.loader-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Circular loader styling */
+.loader {
+  border: 8px solid rgba(0, 0, 0, 0.1); /* Light grey border */
+  border-left: 8px solid white; /* Dark border for animation */
+  border-radius: 50%;
+  width: 50px; /* Size of the loader */
+  height: 50px; /* Size of the loader */
+  animation: spin 1s linear infinite; /* Rotation animation */
+}
+
+/* Keyframes for spin animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Container for cards */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Card styling */
+.card {
+  background: #FFF8F3;
+  padding: 20px; /* Reduced padding for better fit */
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Hover effects for cards */
+.card:hover {
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px); /* Reduced movement for smoother effect */
+}
+
+/* Card image */
+.card-image {
+  width: 100%;
+  height: 200px; /* Adjusted height */
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 15px; /* Reduced margin */
+}
+
+/* Bookmark icon container */
+.bookmark-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+}
+
+/* Bookmark icon button */
+.bookmark-icon-button {
+  background: #405D72; /* Blue color */
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.bookmark-icon-button img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Hover effect for bookmark button */
+.bookmark-icon-button:hover {
+  background-color: #758694; /* Lighter blue on hover */
+  transform: scale(1.1);
+}
+
+/* Bookmarked button styling */
+.bookmarked {
+  background-color: #758694; /* Lighter blue */
+}
+
+/* Title styling */
+.card-title {
+  margin: 0 0 12px;
+  color: #405D72;
+  cursor: pointer;
+  font-size: 1.2em; /* Adjusted font size */
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* Hover effect for titles */
+.card-title:hover {
+  color: #758694;
+}
+
+/* Excerpt styling */
+.card-content {
+  margin-bottom: 18px;
+  color: #333;
+  line-height: 1.5;
+  font-size: 1rem; /* Ensured consistent font size */
+}
+
+/* No articles message styling */
+.no-articles-message {
+  padding: 100px; /* Adjusted padding */
+  text-align: center;
+  font-size: 1.5em;
+  color: #405D72;
+}
+
+/* Pagination controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px; /* Added space above */
+  margin-bottom: 20px; /* Added space below */
+  width: 100%;
+  color: white;
+}
+
+.pagination-controls button {
+  background-color: #405D72;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  margin: 0 5px;
+}
+
+.pagination-controls button:disabled {
+  background-color: #d0d0d0;
+  cursor: not-allowed;
+}
+
+/* Hover effect for pagination buttons */
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #758694;
+}
+
+.bookmark-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}

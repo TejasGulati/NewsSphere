@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Page</title>
+    <link rel="stylesheet" href="./article-detail.component.css">
+</head>
+<body>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+
+    <div class="article-detail-container" *ngIf="article">
+        <!-- Share Button Inside the Article Container -->
+        <div class="share-dropdown-container">
+            <img src="../../assets/share.png" alt="Share" class="share-image" (click)="toggleDropdown()">
+            <div *ngIf="isDropdownOpen" class="dropdown-menu">
+                <a *ngIf="article?.source_url" (click)="shareOnWhatsApp()" class="dropdown-item">
+                    <img src="../../assets/whatsapp.png" alt="WhatsApp" class="social-icon">
+                    WhatsApp
+                </a>
+                <a *ngIf="article?.source_url" (click)="copyToClipboard()" class="dropdown-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="social-icon">
+                    Instagram
+                </a>
+                <a *ngIf="article?.source_url" (click)="shareOnFacebook()" class="dropdown-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="social-icon">
+                    Facebook
+                </a>
+            </div>
+        </div>
+
+        <div class="title-container">
+            <h1>{{ article.title }}</h1>
+        </div>
+        <img *ngIf="article.media_url" [src]="article.media_url" alt="Article image" class="article-image">
+        <p>{{ article.content }}</p>
+        <div class="button-container">
+            <button *ngIf="article.source_url" (click)="openSource()" class="source-button">Source</button>
+            <button (click)="exploreOtherArticles()" class="explore-button">Explore Other Articles</button>
+        </div>
+    </div>
+</body>
+</html>

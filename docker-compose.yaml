@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend  # Point to the frontend directory
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"  # Map container port 80 to host port 4200
+    depends_on:
+      - backend
+    environment:
+      - API_URL=http://backend:8000  
+    networks:
+      - backend_network
+
+  backend:
+    build:
+      context: ./backend  # Point to the backend directory
+      dockerfile: Dockerfile
+    command: >
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend:/BACKEND
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SECRET_KEY=django-insecure-p51@0k#j^jfsdo$dyc*5hp&b!-ffap&1&9vdezzp-rgsfovu7&
+      - DJANGO_DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - DATABASE_NAME=news_sphere
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=iamnoobokay
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+    networks:
+      - backend_network
+
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: iamnoobokay
+      MYSQL_DATABASE: news_sphere
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3307:3306"
+    networks:
+      - backend_network
+
+networks:
+  backend_network:
+    external:
+      name: backend_network
+
+volumes:
+  db_data:

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./dashboard.component.css"> <!-- Update the path to your CSS file -->
+</head>
+<body>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+    <div class="dashboard-container">
+        <header class="welcome-insight-container">
+            <div class="welcome-section">
+                <div class="welcome-message">
+                    <h1 style="margin-left:12px">Hey {{ user.name }}!</h1>
+                    <p class="welcome-message">{{ welcomeMessage }}</p>
+                </div>
+            </div>
+            <div class="insight-section">
+                <h2>INSIGHT</h2>
+                <div class="stat-item">
+                    <span class="stat-value">{{ userStats.articlesRead }}</span>
+                    <span class="stat-label">Articles Read</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ userStats.bookmarks }}</span>
+                    <span class="stat-label">Bookmarks</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="news-categories">
+            <h2>News Categories</h2>
+            <div class="category-buttons">
+                <button *ngFor="let category of categories" (click)="filterByCategory(category)">
+                    {{ category }}
+                </button>
+            </div>
+        </section>
+
+        <section class="articles-container">
+            <h2>Trending Now</h2>
+            <div class="card-container">
+                <div *ngFor="let article of trendingArticles" class="card">
+                    <img *ngIf="article.media_url" [src]="article.media_url" alt="Article image" class="card-image">
+                    <h3 (click)="readArticle(article.id)" class="card-title">{{ article.title }}</h3>
+                    <p class="card-content">{{ article.summary }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="articles-container">
+            <h2>Recommended For You</h2>
+            <div class="card-container">
+                <div *ngFor="let article of recommendedArticles" class="card">
+                    <img *ngIf="article.media_url" [src]="article.media_url" alt="Article image" class="card-image">
+                    <h3 (click)="readArticle(article.id)" class="card-title">{{ article.title }}</h3>
+                    <p class="card-content">{{ article.summary }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

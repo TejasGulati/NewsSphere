@@ -1,0 +1,47 @@
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Ensure items are spaced properly */
+    background-color: #405D72;
+    padding: 5px 10px; /* Reduced padding for a more compact look */
+    margin-bottom: 0; /* Remove bottom margin to eliminate space below the navbar */
+    box-shadow: none; /* Remove any box shadow if applied */
+    width: 100%; /* Ensure the navbar covers the full width of the viewport */
+    box-sizing: border-box; /* Include padding in the width calculation */
+}
+
+/* Additional styling to ensure there is no space below the navbar */
+body {
+    margin: 0; /* Ensure no default margin on the body */
+}
+
+/* Navbar items */
+.navbar-item, .navbar-item-button {
+    color: #FFF8F3;
+    font-size: 1.2rem; /* Reduced font size for a more professional look */
+    text-decoration: none;
+    padding: 8px 15px; /* Reduced padding for a more compact look */
+    cursor: pointer; /* Pointer cursor for all navbar items */
+}
+
+/* Hover effects */
+.navbar-item:hover, .navbar-item-button:hover {
+    color: #758694;
+}
+
+/* Special styling for NewsSphere link */
+.navbar-item-button {
+    font-size: 1.5rem; /* Slightly reduced font size for NewsSphere */
+    padding: 10px 20px; /* Reduced padding for NewsSphere */
+    background-color: #405D72; /* Background color */
+    color: #FFF8F3; /* Text color */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* Remove underline */
+    margin-right: 15px; /* Reduced space between NewsSphere and other items */
+}
+
+/* Move Logout to the right extreme */
+.logout {
+    margin-left: auto;
+}

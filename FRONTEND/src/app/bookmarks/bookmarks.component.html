@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./bookmarks.component.css">
+  <title>Bookmark Page</title>
+</head>
+<body>
+  <app-navbar></app-navbar>
+  <router-outlet></router-outlet>
+  <div class="bookmarks-container">
+    <h1 style="background-color: #405D72; color: white; padding: 25px; border-radius: 8px">Bookmarked Articles</h1>
+
+    <!-- Bookmark Message Pop-up -->
+    <div *ngIf="showBookmarkMessage" class="bookmark-message">
+      {{ bookmarkMessage }}
+    </div>
+
+    <!-- Display message if no bookmarked articles -->
+    <div *ngIf="bookmarkedArticles.length === 0; else bookmarksList">
+      <p class="nob" style="color: white; font-size: 30px;">No Bookmarks</p>
+    </div>
+
+    <!-- Template for displaying bookmarks -->
+    <ng-template #bookmarksList>
+      <div class="card-container">
+        <div *ngFor="let bookmarkedArticle of bookmarkedArticles" class="card">
+          <img *ngIf="bookmarkedArticle.article_media_url" [src]="bookmarkedArticle.article_media_url" alt="Article image" class="card-image">
+          <div class="bookmark-icon">
+            <button class="bookmark-icon-button" (click)="removeBookmark(bookmarkedArticle)">
+              <img src="../../assets/boookmark.png" alt="Remove Bookmark Icon" />
+            </button>
+          </div>
+          <div class="card-content">
+            <h3 (click)="viewArticle(bookmarkedArticle.article_id)" class="card-title">
+              {{ bookmarkedArticle.article_title }}
+            </h3>
+            <p class="card-excerpt">{{ bookmarkedArticle.article_content | slice:0:100 }}...</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</body>
+</html>

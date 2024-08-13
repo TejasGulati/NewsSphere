@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Articles Page</title>
+  <link rel="stylesheet" href="./articles.component.css"> <!-- Link to your CSS file -->
+  <!-- Add Angular and other necessary script references here -->
+</head>
+<body>
+  <app-navbar></app-navbar>
+  <router-outlet></router-outlet>
+  
+  <!-- Bookmark Message Pop-up -->
+  <div *ngIf="showBookmarkMessage" class="bookmark-message">
+    {{ bookmarkMessage }}
+  </div>
+
+  <div class="articles-container">
+    <!-- Loader -->
+    <div *ngIf="isLoading" class="loader-container">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Articles Header and Filter -->
+    <div class="articles-header" *ngIf="!isLoading">
+      <h1>Latest Articles</h1>
+      <div class="category-filter">
+        <select id="category" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category | titlecase }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Articles Display -->
+    <div *ngIf="!isLoading && displayedArticles.length > 0; else noArticlesTemplate" class="card-container">
+      <div *ngFor="let article of displayedArticles" class="card">
+        <div class="bookmark-icon">
+          <button 
+            class="bookmark-icon-button"
+            [ngClass]="{'bookmarked': isBookmarked(article.id)}"
+            (click)="toggleBookmark(article)">
+            <img src="../../assets/bookmark.png" alt="Bookmark Icon" />
+          </button>
+        </div>
+        <img *ngIf="article.media_url" [src]="article.media_url" alt="Article image" class="card-image">
+        <h3 (click)="viewArticle(article)" class="card-title">
+          {{ article.title }}
+        </h3>
+        <p class="card-content">{{ article.content | slice:0:100 }}...</p>
+      </div>
+    </div>
+
+    <!-- Template displayed when there are no articles on the page -->
+    <ng-template #noArticlesTemplate>
+      <div *ngIf="!isLoading" class="no-articles-message">
+        <p style="color: white;">All articles bookmarked on this page.</p>
+      </div>
+    </ng-template>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="!isLoading" class="pagination-controls">
+      <button (click)="previousPage()" [disabled]="currentPage === 1">&lt;</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+    </div>
+  </div>
+</body>
+</html>

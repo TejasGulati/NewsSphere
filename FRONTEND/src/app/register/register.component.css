@@ -1,0 +1,45 @@
+body {
+    background-color: #FFF8F3; /* Light background color */
+    background-image: url('../../assets/img.png');
+    background-size: cover; /* Makes the image cover the entire body */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents repeating the image */
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    background-color: rgba(247, 231, 220,0.7); /* Card background color */
+}
+.card-body {
+    padding: 2rem;
+}
+.form-label.required::after {
+    content: " *";
+    color: red;
+}
+.btn-primary {
+    background-color: #405D72;
+    border-color: #405D72;
+}
+.btn-primary:hover {
+    background-color: #758694;
+    border-color: #758694;
+}
+.invalid-feedback {
+    display: block;
+    font-size: 0.875em;
+}
+.alert {
+    margin-top: 1rem;
+}
