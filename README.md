@@ -17,6 +17,8 @@ This is a web application built using Django REST Framework for the backend, Cel
 - [API Documentation](#api-documentation)
 - [Frontend Build](#frontend-build)
 - [License](#license)
+- [CONTACT](#contact)
+
 
 ## Project Setup
 
@@ -85,6 +87,10 @@ This is a web application built using Django REST Framework for the backend, Cel
     npm install
     ```
 
+## CONTACT
+
+email:tejasgulati11227@gmail.com
+
 ## Environment Variables
 
 Create a `.env` file in the root directory of your project and add the following environment variables:
@@ -102,3 +108,6 @@ DB_PORT=3306
 
 # Redis configuration
 REDIS_URL=redis://localhost:6379/0
+
+#CONTACT
+email:tejasgulati11227@gmail.com
