@@ -35,7 +35,14 @@ jobs:
           cd FRONTEND
           npm run build --prod
 
-      - name: Deploy
-        # Here you would add steps to deploy your Angular app, such as copying files to a server or pushing to a CDN
+      - name: Build Docker image
         run: |
-          echo "Deploying Angular app..."
+          docker build -t angular-app -f FRONTEND/Dockerfile FRONTEND
+
+      - name: Push Docker image
+        run: |
+          docker tag angular-app tejasgulati/angular-app:latest
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push tejasgulati/angular-app:latest
+
+ 
