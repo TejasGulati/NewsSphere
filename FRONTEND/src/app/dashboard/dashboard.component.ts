@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { DashboardService } from '../dashboard.service';
 
 interface User {
   id: number;
@@ -42,7 +43,11 @@ export class DashboardComponent implements OnInit {
   private bookmarksUrl = 'http://127.0.0.1:8000/dashboard/bookmarks/count';
   private viewsUrl = 'http://127.0.0.1:8000/dashboard/articles/view-count';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private dashboardService: DashboardService
+  ) {}
 
   ngOnInit(): void {
     combineLatest([
@@ -139,7 +144,8 @@ export class DashboardComponent implements OnInit {
 
   filterByCategory(category: string): void {
     console.log(`Filtering by category: ${category}`);
-    this.router.navigate(['/articles'], { queryParams: { category } }); // Navigate with query params
+    this.dashboardService.setSelectedCategory(category.toLowerCase());
+    this.router.navigate(['/articles'], { queryParams: { category: category.toLowerCase() } });
   }
 
   readArticle(articleId: number): void {

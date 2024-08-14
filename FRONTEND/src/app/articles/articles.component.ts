@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../dashboard.service';
 import { BookmarkService } from '../bookmark.service';
 import { Subscription, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 interface Article {
   id: number;
@@ -38,6 +38,7 @@ export class ArticlesComponent implements OnInit, OnDestroy {
   displayedArticles: Article[] = [];
   bookmarkedArticleIds: Set<number> = new Set();
   private refreshSubscription: Subscription | undefined;
+  private categorySubscription: Subscription | undefined;
 
   // Pagination properties
   pageSize: number = 9;
@@ -66,9 +67,9 @@ export class ArticlesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.selectedCategory = params['category'] || '';
+      this.selectedCategory = params['category'] || ''; // Default to no category if not present
       this.currentPage = 1;
-      this.loadBookmarks();
+      this.loadBookmarksAndArticles();
     });
   }
 
@@ -76,14 +77,33 @@ export class ArticlesComponent implements OnInit, OnDestroy {
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
     }
+    if (this.categorySubscription) {
+      this.categorySubscription.unsubscribe();
+    }
+  }
+
+  loadBookmarksAndArticles(): void {
+    this.isLoading = true;
+    this.bookmarkService.getBookmarks().pipe(
+      catchError(error => {
+        console.error('Error loading bookmarks:', error);
+        return of([]);
+      }),
+      finalize(() => this.loadArticles())
+    ).subscribe(
+      (bookmarks: BookmarkedArticle[]) => {
+        this.bookmarkedArticleIds = new Set(bookmarks.map(b => b.article_id));
+      }
+    );
   }
 
   loadArticles(): void {
-    if (!this.hasMoreArticles) return; // Do not load articles if there are no more available
+    if (!this.hasMoreArticles) return;
 
-    this.isLoading = true; // Set loading state to true
-
-    this.dashboardService.getArticles(this.selectedCategory, this.currentPage).subscribe(
+    // Load articles based on the selected category if specified, otherwise load all articles
+    this.dashboardService.getArticles(this.selectedCategory, this.currentPage).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe(
       (response) => {
         const articles = response.results.filter(article => !this.bookmarkedArticleIds.has(article.id));
         this.totalPages = Math.ceil(response.count / this.pageSize);
@@ -92,14 +112,12 @@ export class ArticlesComponent implements OnInit, OnDestroy {
           this.displayedArticles = articles;
           this.allArticlesBookmarked = false;
         } else {
-          this.displayedArticles = []; // Clear displayed articles
+          this.displayedArticles = [];
           this.allArticlesBookmarked = true;
         }
-        this.isLoading = false; // Set loading state to false
       },
       (error) => {
         console.error('Error fetching articles:', error);
-        this.isLoading = false; // Set loading state to false in case of error
       }
     );
   }
@@ -139,23 +157,6 @@ export class ArticlesComponent implements OnInit, OnDestroy {
       this.currentPage--;
       this.loadArticles();
     }
-  }
-
-  loadBookmarks(): void {
-    this.isLoading = true; // Set loading state to true
-
-    this.bookmarkService.getBookmarks().pipe(
-      catchError(error => {
-        console.error('Error loading bookmarks:', error);
-        this.isLoading = false; // Set loading state to false in case of error
-        return of([]);
-      })
-    ).subscribe(
-      (bookmarks: BookmarkedArticle[]) => {
-        this.bookmarkedArticleIds = new Set(bookmarks.map(b => b.article_id));
-        this.loadArticles(); // Reload articles after loading bookmarks
-      }
-    );
   }
 
   toggleBookmark(article: Article): void {
@@ -205,15 +206,15 @@ export class ArticlesComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLSelectElement;
     this.selectedCategory = target.value;
     this.currentPage = 1;
+    this.isLoading = true;
 
-    // Navigate with query parameters to update the URL
+    this.dashboardService.setSelectedCategory(this.selectedCategory);
+
     this.router.navigate([], {
       queryParams: { category: this.selectedCategory },
       queryParamsHandling: 'merge'
     });
 
-    // Reload articles based on the new category
-    this.loadArticles();
+    this.loadBookmarksAndArticles();
   }
 }
-

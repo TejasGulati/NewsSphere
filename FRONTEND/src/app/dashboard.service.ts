@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
@@ -40,6 +40,8 @@ interface PaginatedResponse<T> {
 })
 export class DashboardService {
   private apiUrl = 'http://127.0.0.1:8000';
+  private selectedCategorySubject = new BehaviorSubject<string>('');
+  selectedCategory$ = this.selectedCategorySubject.asObservable();
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -65,7 +67,7 @@ export class DashboardService {
       params = params.set('category', selectedCategory);
     }
 
-    return this.http.get<PaginatedResponse<Article>>(`${this.apiUrl}/dashboard/articles/`, { 
+    return this.http.get<PaginatedResponse<Article>>(`${this.apiUrl}/dashboard/articles/`, {
       headers: this.getHeaders(),
       params: params
     }).pipe(
@@ -77,6 +79,10 @@ export class DashboardService {
     return this.http.get<Article>(`${this.apiUrl}/dashboard/articles/${id}/`, { headers: this.getHeaders() }).pipe(
       catchError(this.handleError)
     );
+  }
+
+  setSelectedCategory(category: string) {
+    this.selectedCategorySubject.next(category);
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
