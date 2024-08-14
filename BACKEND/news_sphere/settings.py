@@ -115,7 +115,7 @@ REST_FRAMEWORK = {
 }
 # Simple JWT settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Shorter lifespan for testing
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Shorter lifespan for testing
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -148,12 +148,14 @@ import os
 
 # ... other settings
 
+
 CELERY_BEAT_SCHEDULE = {
     'scrape_articles': {
         'task': 'dashboard.tasks.scrape_articles',
-        'schedule': crontab(minute='*/30'),  # Every 30 minutes
+        'schedule': crontab(minute=0, hour='*/5'),  # Every 5 hours at the top of the hour
     },
 }
+
 
 
 # news_sphere/settings.py
