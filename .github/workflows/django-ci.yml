@@ -48,6 +48,6 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker tag django-app yourdockerhubusername/django-app:latest
+          docker tag django-app tejasgulati/django-app:latest
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-          docker push yourdockerhubusername/django-app:latest
+          docker push tejasgulati/django-app:latest
