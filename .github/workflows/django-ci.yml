@@ -44,7 +44,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t django-app .
+            docker build -t django-app -f BACKEND/Dockerfile BACKEND
+
+
 
       - name: Push Docker image
         run: |
