@@ -71,7 +71,7 @@ DATABASES = {
         'NAME': 'news_sphere',
         'USER': 'root',
         'PASSWORD': 'iamnoobokay',
-        'HOST': 'db',  # Change to 'db' for Docker
+        'HOST': 'localhost',  # Change to 'db' for Docker
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
