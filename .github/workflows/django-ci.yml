@@ -32,9 +32,15 @@ jobs:
         run: |
           pip install -r BACKEND/requirements.txt
 
+      - name: Set environment variables
+        run: |
+          echo "DJANGO_SETTINGS_MODULE=news_sphere.settings" >> $GITHUB_ENV
+          echo "CELERY_BROKER_URL=redis://localhost:6379/0" >> $GITHUB_ENV
+          echo "CELERY_RESULT_BACKEND=redis://localhost:6379/0" >> $GITHUB_ENV
+
       - name: Run tests
         run: |
-          pytest
+          pytest --maxfail=1 --disable-warnings -q
 
       - name: Build Docker image
         run: |
