@@ -23,6 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd FRONTEND
           npm install
 
       - name: Run tests
