@@ -1,0 +1,48 @@
+name: Angular CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd FRONTEND
+          npm install
+
+      # - name: Run tests
+      #   run: |
+      #     npm run test -- --watch=false
+
+      - name: Build
+        run: |
+          cd FRONTEND
+          npm run build --prod
+
+      - name: Build Docker image
+        run: |
+          docker build -t angular-app -f FRONTEND/Dockerfile FRONTEND
+
+      - name: Push Docker image
+        run: |
+          docker tag angular-app tejasgulati/angular-app:latest
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push tejasgulati/angular-app:latest
+
+ 
