@@ -1,3 +1,4 @@
+name: DJANGO CI/CD
 on:
   push:
     branches:
