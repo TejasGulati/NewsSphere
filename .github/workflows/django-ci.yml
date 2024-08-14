@@ -38,7 +38,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r BACKEND/requirements.txt
-
       - name: Set environment variables
         run: |
           echo "DJANGO_SETTINGS_MODULE=news_sphere.settings" >> $GITHUB_ENV
@@ -49,11 +48,9 @@ jobs:
           echo "DATABASE_PORT=3306" >> $GITHUB_ENV
           echo "CELERY_BROKER_URL=redis://localhost:6379/0" >> $GITHUB_ENV
           echo "CELERY_RESULT_BACKEND=redis://localhost:6379/0" >> $GITHUB_ENV
-
       - name: Build Docker image
         run: |
           docker build -t django-app -f BACKEND/Dockerfile BACKEND
-
       - name: Push Docker image
         run: |
           docker tag django-app tejasgulati/django-app:latest
@@ -92,7 +89,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r BACKEND/requirements.txt
-
       - name: Set environment variables
         run: |
           echo "DJANGO_SETTINGS_MODULE=news_sphere.settings" >> $GITHUB_ENV
@@ -103,14 +99,14 @@ jobs:
           echo "DATABASE_PORT=3306" >> $GITHUB_ENV
           echo "CELERY_BROKER_URL=redis://localhost:6379/0" >> $GITHUB_ENV
           echo "CELERY_RESULT_BACKEND=redis://localhost:6379/0" >> $GITHUB_ENV
-
+      - name: Initial wait for MySQL to start
+        run: sleep 60  # Adjust this value based on your database size
       - name: Wait for MySQL to be ready
         run: |
           until mysqladmin ping -h localhost --silent; do
             echo "Waiting for MySQL to be ready..."
-            sleep 5
+            sleep 10  # Increase the wait interval for larger datasets
           done
-
       - name: Run tests
         run: |
           cd BACKEND
