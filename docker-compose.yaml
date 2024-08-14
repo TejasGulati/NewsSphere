@@ -3,10 +3,10 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend  # Point to the frontend directory
       dockerfile: Dockerfile
     ports:
-      - "4200:80"
+      - "4200:80"  # Map container port 80 to host port 4200
     depends_on:
       - backend
     environment:
@@ -16,7 +16,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./backend  # Point to the backend directory
       dockerfile: Dockerfile
     command: >
       bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
@@ -54,12 +54,6 @@ services:
       - "3307:3306"
     networks:
       - backend_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent"]
-      interval: 30s
-      retries: 5
-      start_period: 60s
-      timeout: 30s
 
   redis:
     image: redis:alpine
@@ -68,11 +62,10 @@ services:
       - "6379:6379"
     networks:
       - backend_network
-    entrypoint: /bin/sh -c "while true; do redis-server || (sleep 10 && sudo lsof -i :6379 && sudo kill -9 $(sudo lsof -t -i:6379) && redis-server); done"
 
   celery_worker:
     build:
-      context: ./backend
+      context: ./backend  # Reuse backend Dockerfile
       dockerfile: Dockerfile
     command: celery -A news_sphere worker -l info
     volumes:
@@ -88,7 +81,7 @@ services:
 
   celery_beat:
     build:
-      context: ./backend
+      context: ./backend  # Reuse backend Dockerfile
       dockerfile: Dockerfile
     command: celery -A news_sphere beat -l info
     volumes:

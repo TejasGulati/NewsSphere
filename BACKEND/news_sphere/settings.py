@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.conf import settings
 from celery.schedules import crontab
 from pathlib import Path
-import environ
+
 
 import dotenv
 dotenv.load_dotenv()
@@ -172,6 +172,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-
+CELERY_BROKER_CONNECTION_RETRY = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 import news_sphere.celery
