@@ -57,18 +57,18 @@ export class RegisterComponent implements OnInit {
             this.router.navigate(['/login']);
           }, 4000);
         },
-        error: (error: any) => {
+        error: (error: Error) => {
           console.error('Registration error:', error);
-          this.errorMessage = this.getServerErrorMessage(error);
+          this.errorMessage = error.message;
           setTimeout(() => {
-            this.errorMessage = ''; // Clear the error message after 3 seconds
+            this.errorMessage = '';
           }, 4000);
         }
       });
     } else {
       this.errorMessage = this.getFormErrors(this.registerForm);
       setTimeout(() => {
-        this.errorMessage = ''; // Clear the error message after 3 seconds
+        this.errorMessage = '';
       }, 4000);
     }
   }

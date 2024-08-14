@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -33,13 +33,41 @@ export class AuthService {
         this.storeTokens(response);
         this.loggedIn.next(true);
       }),
-      catchError(this.handleError)
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'An unknown error occurred!';
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error.email) {
+            errorMessage = error.error.email[0];
+          } else if (error.error.password) {
+            errorMessage = error.error.password[0];
+          } else {
+            errorMessage = Object.values(error.error).flat().join(' ');
+          }
+        }
+        return throwError(() => new Error(errorMessage));
+      })
     );
   }
 
   register(name: string, email: string, password: string): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register/`, { name, email, password }).pipe(
-      catchError(this.handleError)
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'An unknown error occurred!';
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error.email) {
+            errorMessage = error.error.email[0];
+          } else if (error.error.password) {
+            errorMessage = error.error.password[0];
+          } else {
+            errorMessage = Object.values(error.error).flat().join(' ');
+          }
+        }
+        return throwError(() => new Error(errorMessage));
+      })
     );
   }
 

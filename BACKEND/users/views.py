@@ -14,29 +14,48 @@ import logging
 # Set up logger
 logger = logging.getLogger(__name__)
 
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from users.serializers import UserSerializer
+from users.models import User
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                # Check if email already exists
+                if User.objects.filter(email=serializer.validated_data['email']).exists():
+                    return Response({'email': ['Email already exists.']}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Validate password
+                validate_password(serializer.validated_data['password'])
+                
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except ValidationError as e:
+                return Response({'password': e.messages}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        if not email or not password:
-            return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not email:
+            return Response({'email': ['Email is required.']}, status=status.HTTP_400_BAD_REQUEST)
+        if not password:
+            return Response({'password': ['Password is required.']}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.filter(email=email).first()
 
         if user is None:
-            raise AuthenticationFailed('User not found!')
-        
+            return Response({'email': ['User not found.']}, status=status.HTTP_404_NOT_FOUND)
+
         if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect Password!')
+            return Response({'password': ['Incorrect password.']}, status=status.HTTP_400_BAD_REQUEST)
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -48,7 +67,6 @@ class LoginView(APIView):
         })
         response.set_cookie(key='jwt', value=refresh_token, httponly=True, secure=True)
         return response
-
 class RefreshTokenView(APIView):
     def post(self, request):
         refresh_token = request.COOKIES.get('jwt')

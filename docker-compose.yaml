@@ -26,6 +26,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     environment:
       - DJANGO_SECRET_KEY=django-insecure-p51@0k#j^jfsdo$dyc*5hp&b!-ffap&1&9vdezzp-rgsfovu7&
       - DJANGO_DEBUG=True
@@ -35,6 +36,8 @@ services:
       - DATABASE_PASSWORD=iamnoobokay
       - DATABASE_HOST=db
       - DATABASE_PORT=3306
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     networks:
       - backend_network
 
@@ -49,6 +52,46 @@ services:
       MYSQL_ROOT_HOST: '%'
     ports:
       - "3307:3306"
+    networks:
+      - backend_network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend_network
+
+  celery_worker:
+    build:
+      context: ./backend  # Reuse backend Dockerfile
+      dockerfile: Dockerfile
+    command: celery -A news_sphere worker -l info
+    volumes:
+      - ./backend:/BACKEND
+    depends_on:
+      - backend
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - backend_network
+
+  celery_beat:
+    build:
+      context: ./backend  # Reuse backend Dockerfile
+      dockerfile: Dockerfile
+    command: celery -A news_sphere beat -l info
+    volumes:
+      - ./backend:/BACKEND
+    depends_on:
+      - backend
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     networks:
       - backend_network
 

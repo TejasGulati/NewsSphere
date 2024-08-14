@@ -3,13 +3,17 @@ import os
 from datetime import timedelta
 from django.conf import settings
 from celery.schedules import crontab
+from pathlib import Path
+import environ
 
+import dotenv
+dotenv.load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-p51@0k#j^jfsdo$dyc*5hp&b!-ffap&1&9vdezzp-rgsfovu7&')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
@@ -71,7 +75,7 @@ DATABASES = {
         'NAME': 'news_sphere',
         'USER': 'root',
         'PASSWORD': 'iamnoobokay',
-        'HOST': 'localhost',  # Change to 'db' for Docker
+        'HOST': 'db',  # Change to 'db' for Docker
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',

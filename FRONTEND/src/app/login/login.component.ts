@@ -32,10 +32,10 @@ export class LoginComponent implements OnInit {
         next: () => {
           this.router.navigate(['/dashboard']);
         },
-        error: (error) => {
-          this.errorMessage = this.getServerErrorMessage(error);
+        error: (error: Error) => {
+          this.errorMessage = error.message;
           setTimeout(() => {
-            this.errorMessage = ''; // Clear the error message after 2 seconds
+            this.errorMessage = '';
           }, 4000);
           console.error('Login error:', error);
         }
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
     } else {
       this.errorMessage = this.getFormErrors(this.loginForm);
       setTimeout(() => {
-        this.errorMessage = ''; // Clear the error message after 2 seconds
+        this.errorMessage = '';
       }, 4000);
     }
   }
