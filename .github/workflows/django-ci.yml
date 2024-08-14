@@ -73,4 +73,5 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest --maxfail=1 --disable-warnings -q
+          cd BACKEND 
+          pytest --maxfail=1 --disable-warnings  -q --tb=short
