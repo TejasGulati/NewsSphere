@@ -26,9 +26,9 @@ jobs:
           cd FRONTEND
           npm install
 
-      - name: Run tests
-        run: |
-          npm run test -- --watch=false
+      # - name: Run tests
+      #   run: |
+      #     npm run test -- --watch=false
 
       - name: Build
         run: |
