@@ -32,6 +32,7 @@ jobs:
 
       - name: Build
         run: |
+          cd FRONTEND
           npm run build --prod
 
       - name: Deploy
