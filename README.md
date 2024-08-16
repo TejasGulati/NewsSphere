@@ -109,5 +109,3 @@ DB_PORT=3306
 # Redis configuration
 REDIS_URL=redis://localhost:6379/0
 
-#CONTACT
-email:tejasgulati11227@gmail.com
