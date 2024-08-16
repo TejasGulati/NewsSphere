@@ -15,6 +15,12 @@ import urllib3
 import json
 import lxml
 from lxml import etree
+from django.db import transaction
+from langdetect import detect, LangDetectException
+
+# Add this import at the top of the file
+import langdetect
+
 
 # Disable SSL warnings (use with caution)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -29,49 +35,64 @@ requests_cache.install_cache('news_cache', expire_after=3600)  # Cache for 1 hou
 # Define the lists of websites by category
 WEBSITES = {
     'technology': [
-        'https://www.medianama.com/',
-        'https://www.news18.com/technology/',
         'https://www.theverge.com/tech',
         'https://www.cnet.com/tech/',
         'https://www.techcrunch.com/',
         'https://www.wired.com/',
+        'https://www.engadget.com/',  # Added
+        'https://arstechnica.com/',  # Added
+        'https://www.zdnet.com/',  # Added
+        'https://www.tomsguide.com/',  # Added
+        'https://www.techradar.com/',  # Added
+        'https://www.gsmarena.com/',  # Added
     ],
     'sports': [
-        'https://www.news18.com/sports/',
-        'https://www.indianexpress.com/sports/',
         'https://www.espn.com/',
         'https://www.skysports.com/',
-        'https://www.bbc.com/sport',
         'https://www.cbssports.com/',
         'https://www.foxsports.com/',
+        'https://www.sports.yahoo.com/',  # Added
+        'https://www.nbcsports.com/',  # Added
+        'https://www.sportingnews.com/',  # Added
+        'https://www.sportsillustrated.com/',  # Added
+        'https://www.bleacherreport.com/',  # Added
+        'https://www.marca.com/en/',  # Added
     ],
     'entertainment': [
-        'https://www.radioandmusic.com/',
-        'https://www.news18.com/movies/',
-        'https://www.news18.com/entertainment/',
         'https://variety.com/',
         'https://www.ew.com/',
+        'https://www.hollywoodreporter.com/',  # Added
+        'https://www.billboard.com/',  # Added
+        'https://www.tmz.com/',  # Added
+        'https://www.etonline.com/',  # Added
+        'https://www.nme.com/',  # Added
+        'https://www.indiewire.com/',  # Added
+        'https://www.collider.com/',  # Added
+        'https://www.rollingstone.com/',  # Added
     ],
     'politics': [
-        'https://www.washingtonpost.com/politics/',
-        'https://www.news18.com/politics/',
-        'https://www.msnbc.com/',
         'https://www.politico.com/',
         'https://www.theguardian.com/us-news/us-politics',
         'https://www.bbc.com/news/politics',
         'https://www.aljazeera.com/politics/',
-        'https://www.reuters.com/politics/'
+        'https://www.cnn.com/politics/',  # Added
+        'https://www.nytimes.com/section/politics',  # Added
+        'https://www.washingtonpost.com/politics/',  # Added
+        'https://www.reuters.com/politics/',  # Added
+        'https://www.foxnews.com/politics',  # Added
+        'https://www.msnbc.com/',  # Added
     ],
     'science': [
         'https://www.scientificamerican.com/',
         'https://www.sciencenews.org/',
         'https://www.livescience.com/',
-        'https://www.nationalgeographic.com/science',
-        'https://www.sciencedaily.com/',
-        'https://www.newscientist.com/',
         'https://www.space.com/',
         'https://www.discovermagazine.com/',
-        'https://www.popularmechanics.com/science/'
+        'https://www.newscientist.com/', 
+        'https://www.nationalgeographic.com/science/',  # Added
+        'https://www.smithsonianmag.com/science-nature/',  # Added
+        'https://www.popsci.com/',  # Added
+        'https://www.chemistryworld.com/',  # Added
     ]
 }
 
@@ -116,7 +137,6 @@ def clean_text(text):
     text = re.sub(r'[\'"""\'•]', '', text)
     
     return text
-
 
 def extract_summary(article_soup, title):
     """Extract and summarize article content while ensuring relevance to the title."""
@@ -281,17 +301,27 @@ def fetch_articles_from_page(session, category, page_url, max_articles_per_page=
                         # Check if the summary indicates low relevance
                         if summary != 'Content may not be relevant to the title':
                             if summary and media_url and summary != 'No summary available' and summary != 'Error extracting summary' and len(title.split()) > 1:
-                                articles.append({
-                                    'title': title,
-                                    'content': summary,
-                                    'media_url': media_url,
-                                    'source_url': link,
-                                    'category': category,
-                                    'created_at': timezone.now(),
-                                    'updated_at': timezone.now()
-                                })
-                                article_count += 1  # Increment the counter
-                                time.sleep(random.uniform(1, 3))  # Add a random delay between requests
+                                # Detect language
+                                try:
+                                    lang = detect(title + " " + summary)
+                                except LangDetectException:
+                                    lang = "unknown"
+
+                                # Only add English articles
+                                if lang == 'en':
+                                    articles.append({
+                                        'title': title,
+                                        'content': summary,
+                                        'media_url': media_url,
+                                        'source_url': link,
+                                        'category': category,
+                                        'created_at': timezone.now(),
+                                        'updated_at': timezone.now()
+                                    })
+                                    article_count += 1  # Increment the counter
+                                    time.sleep(random.uniform(1, 3))  # Add a random delay between requests
+                                else:
+                                    logger.info(f"Skipping non-English article: {title}")
                         else:
                             logger.info(f"Skipping article due to low relevance: {title}")
 
@@ -302,6 +332,7 @@ def fetch_articles_from_page(session, category, page_url, max_articles_per_page=
     except Exception as e:
         logger.error(f"Error fetching articles from page {page_url}: {e}")
     return articles
+
 
 def scrape_articles():
     """Main function to scrape articles from all categories and save to database."""
@@ -322,23 +353,21 @@ def scrape_articles():
 
         # Save articles to the database
         logger.info(f"Fetched a total of {len(category_articles)} articles for category: {category}")
-        for article_data in category_articles:
-            try:
-                Article.objects.update_or_create(
-                    title=article_data['title'],
-                    defaults={
-                        'content': article_data['content'],
-                        'media_url': article_data['media_url'],
-                        'source_url': article_data['source_url'],
-                        'category': article_data['category'],
-                        'created_at': article_data['created_at'],
-                        'updated_at': article_data['updated_at']
-                    }
-                )
-                logger.info(f"Article '{article_data['title']}' saved to database.")
-            except Exception as e:
-                logger.error(f"Error saving article '{article_data['title']}': {e}")
 
+        with transaction.atomic():  # Use a transaction to handle batch updates
+            Article.objects.bulk_create(
+                [Article(
+                    title=article['title'],
+                    content=article['content'],
+                    media_url=article['media_url'],
+                    source_url=article['source_url'],
+                    category=article['category'],
+                    created_at=article['created_at'],
+                    updated_at=article['updated_at']
+                ) for article in category_articles],
+                ignore_conflicts=True  # Ignore conflicts with existing records
+            )
+            logger.info(f"Articles for category '{category}' saved to database.")
 
 if __name__ == "__main__":
     scrape_articles()

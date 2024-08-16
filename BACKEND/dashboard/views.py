@@ -16,6 +16,12 @@ from django.shortcuts import get_object_or_404
 import logging
 import random
 from rest_framework.pagination import PageNumberPagination
+import requests
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 
 logger = logging.getLogger(__name__)
 
@@ -284,3 +290,178 @@ class TrendingArticlesView(APIView):
         title_keywords = set(article.title.lower().split())
         content_keywords = set(article.content.lower().split())
         return any(keyword in content_keywords for keyword in title_keywords)
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+import requests
+
+# Import the dotenv library and load the environment variables
+from dotenv import load_dotenv
+import os
+
+# Load the .env file
+load_dotenv()
+class WeatherView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        api_key = os.getenv("WEATHER_API_KEY")
+        current_base_url = "http://api.openweathermap.org/data/2.5/weather"
+        forecast_base_url = "http://api.openweathermap.org/data/2.5/forecast"
+        air_pollution_base_url = "http://api.openweathermap.org/data/2.5/air_pollution"
+
+        # Check if latitude and longitude are provided
+        lat = request.query_params.get('lat')
+        lon = request.query_params.get('lon')
+        city = request.query_params.get('city')
+        z = request.query_params.get('z', 10)  # Default zoom level
+        x = request.query_params.get('x', 512)  # Default x coordinate
+        y = request.query_params.get('y', 386)  # Default y coordinate
+
+        # Define layers
+        layers = {
+    "Clouds": "clouds_new",
+    "Precipitation": "precipitation_new",
+    "Sea level pressure": "pressure_new",
+    "Wind speed": "wind_new",
+    "Temperature": "temp_new"
+}
+
+        # Determine request parameters
+        if lat and lon:
+            current_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key,
+                'units': 'metric'
+            }
+            forecast_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key,
+                'units': 'metric'
+            }
+            air_pollution_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key
+            }
+        elif city:
+            # Fetch coordinates for the city
+            geocode_params = {
+                'q': city,
+                'appid': api_key,
+                'units': 'metric'
+            }
+            geocode_response = requests.get(current_base_url, params=geocode_params)
+            geocode_data = geocode_response.json()
+
+            if geocode_response.status_code != 200 or "coord" not in geocode_data:
+                return Response({"error": "Failed to geocode city name or city not found"},
+                                status=geocode_response.status_code)
+
+            lat = geocode_data["coord"]["lat"]
+            lon = geocode_data["coord"]["lon"]
+
+            # Use the obtained coordinates for other requests
+            current_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key,
+                'units': 'metric'
+            }
+            forecast_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key,
+                'units': 'metric'
+            }
+            air_pollution_params = {
+                'lat': lat,
+                'lon': lon,
+                'appid': api_key
+            }
+        else:
+            current_params = {
+                'q': 'New Delhi',  # Default city
+                'appid': api_key,
+                'units': 'metric'
+            }
+            forecast_params = {
+                'q': 'New Delhi',
+                'appid': api_key,
+                'units': 'metric'
+            }
+            air_pollution_params = {
+                'lat': 28.6139,  # Approximate latitude for New Delhi
+                'lon': 77.2090,  # Approximate longitude for New Delhi
+                'appid': api_key
+            }
+
+        try:
+            # Fetch current weather data
+            current_response = requests.get(current_base_url, params=current_params)
+            current_data = current_response.json()
+
+            if current_response.status_code != 200:
+                return Response({"error": current_data.get("message", "Failed to fetch current weather data")},
+                                status=current_response.status_code)
+
+            # Fetch 5-day forecast data
+            forecast_response = requests.get(forecast_base_url, params=forecast_params)
+            forecast_data = forecast_response.json()
+
+            if forecast_response.status_code != 200:
+                return Response({"error": forecast_data.get("message", "Failed to fetch forecast data")},
+                                status=forecast_response.status_code)
+
+            # Fetch air pollution data
+            air_pollution_response = requests.get(air_pollution_base_url, params=air_pollution_params)
+            air_pollution_data = air_pollution_response.json()
+
+            if air_pollution_response.status_code != 200:
+                return Response({"error": air_pollution_data.get("message", "Failed to fetch air pollution data")},
+                                status=air_pollution_response.status_code)
+
+            # Generate URLs for all weather map layers
+            map_urls = {layer_name: f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
+            for layer_name, layer in layers.items()}
+
+            # Extract relevant forecast data
+            forecast_list = forecast_data["list"]
+            filtered_forecast = []
+            for entry in forecast_list[::8][:5]:  # Taking 1 entry per day (8 hours interval) for 5 days
+                filtered_forecast.append({
+                    "date": entry["dt_txt"],
+                    "temperature": entry["main"]["temp"],
+                    "description": entry["weather"][0]["description"]
+                })
+
+            # Combine current weather, forecast, air pollution, and map URLs
+            weather_info = {
+                "current": {
+                    "city": current_data["name"],
+                    "temperature": current_data["main"]["temp"],
+                    "description": current_data["weather"][0]["description"],
+                    "humidity": current_data["main"]["humidity"],
+                    "wind_speed": current_data["wind"]["speed"],
+                },
+                "forecast": {
+                    "city": forecast_data["city"]["name"],
+                    "forecast_data": filtered_forecast
+                },
+                "air_pollution": {
+                    "aqi": air_pollution_data["list"][0]["main"]["aqi"],
+                    "components": air_pollution_data["list"][0]["components"]
+                },
+                "maps": map_urls
+            }
+
+            return Response(weather_info, status=status.HTTP_200_OK)
+
+        except requests.exceptions.RequestException as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

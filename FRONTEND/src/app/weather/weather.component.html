@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./weather.component.css">
+    <title>Weather Page</title>
+</head>
+<body>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+    <div class="weather-container">
+        <div class="weather-header">
+            <h2>Weather</h2>
+            <form (ngSubmit)="searchWeather()" class="search-form">
+                <input id="city" [(ngModel)]="city" name="city" placeholder="Enter city name" required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- Loader -->
+        <div *ngIf="isLoading" class="loader-container">
+            <div class="loader"></div>
+        </div>
+
+        <div *ngIf="!isLoading && weatherData" class="weather-info">
+            <div class="weather-image-card">
+                <img [src]="getWeatherImage()" alt="Weather Image">
+            </div>
+            <div class="weather-card">
+                <h3>Current Weather</h3>
+                <p><strong>City:</strong> {{ weatherData.current.city }}</p>
+                <p><strong>Temperature:</strong> {{ weatherData.current.temperature }}°C</p>
+                <p><strong>Description:</strong> {{ weatherData.current.description }}</p>
+                <p><strong>Humidity:</strong> {{ weatherData.current.humidity }}%</p>
+                <p><strong>Wind Speed:</strong> {{ weatherData.current.wind_speed }} m/s</p>
+            </div>
+            <div class="forecast-card">
+                <h3>5-Day Forecast</h3>
+                <table class="forecast-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Temperature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let day of weatherData.forecast.forecast_data">
+                            <td>{{ day.date | date:'short' }}</td>
+                            <td>{{ day.temperature }}°C</td>
+                            <td>{{ day.description }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="air-pollution-card">
+                <h3>Air Pollution</h3>
+                <p><strong>AQI:</strong> {{ weatherData.air_pollution.aqi }}</p>
+                <p><strong>CO:</strong> {{ weatherData.air_pollution.components.co }} μg/m³</p>
+                <p><strong>NO:</strong> {{ weatherData.air_pollution.components.no }} μg/m³</p>
+                <p><strong>NO2:</strong> {{ weatherData.air_pollution.components.no2 }} μg/m³</p>
+                <p><strong>O3:</strong> {{ weatherData.air_pollution.components.o3 }} μg/m³</p>
+                <p><strong>SO2:</strong> {{ weatherData.air_pollution.components.so2 }} μg/m³</p>
+                <p><strong>PM2.5:</strong> {{ weatherData.air_pollution.components.pm2_5 }} μg/m³</p>
+                <p><strong>PM10:</strong> {{ weatherData.air_pollution.components.pm10 }} μg/m³</p>
+                <p><strong>NH3:</strong> {{ weatherData.air_pollution.components.nh3 }} μg/m³</p>
+            </div>
+        </div>
+
+        <div *ngIf="error && !isLoading" class="error-message" style="font-size: 25px; color: white; margin-top:135px;">
+            <p>{{ error }}</p>
+        </div>
+    </div>
+</body>
+</html>

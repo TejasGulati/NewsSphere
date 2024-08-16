@@ -14,6 +14,7 @@ import { ArticlesComponent } from './articles/articles.component';
 import { BookmarksComponent } from './bookmarks/bookmarks.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { ArticleDetailComponent } from './article-detail/article-detail.component';
+import { WeatherComponent } from './weather/weather.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ArticleDetailComponent } from './article-detail/article-detail.componen
     ArticlesComponent,
     BookmarksComponent,
     NavbarComponent,
-    ArticleDetailComponent
+    ArticleDetailComponent,
+    WeatherComponent
   ],
   imports: [
     BrowserModule,
