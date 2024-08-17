@@ -1,29 +1,33 @@
 from datetime import timedelta
 from tokenize import TokenError
-from django.utils import timezone
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth import logout as django_logout
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
-from dashboard.models import Article, Bookmark, UserArticleView
-from dashboard.serializers import ArticleSerializer, BookmarkSerializer
+from dashboard.models import Article, Bookmark, Notification, UserArticleView
+from dashboard.serializers import ArticleSerializer, BookmarkSerializer, NotificationSerializer
 from users.serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 import logging
 import random
 from rest_framework.pagination import PageNumberPagination
 import requests
-from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.utils import timezone
+from dotenv import load_dotenv
+import os
+
+from users.models import User 
 
 
+# Load the .env file
+load_dotenv()
 logger = logging.getLogger(__name__)
+
 
 class DashboardView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -32,14 +36,35 @@ class DashboardView(APIView):
         user = request.user
         if not user.is_authenticated:
             return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Check and create a welcome notification if this is the first login
+        if not user.last_login:
+            create_notification(user, "Welcome back! It's great to see you again.")
+            user.last_login = timezone.now()  # Update last_login time
+            user.save()  # Save user with the updated last_login
+
         serializer = UserSerializer(user)
         return Response({'message': 'Welcome to your dashboard!', 'user': serializer.data})
+
 
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 9
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+import re
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from better_profanity import profanity
+from .models import Article, UserArticleView, Bookmark
+from .serializers import ArticleSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+profanity.load_censor_words()
 
 class ArticlesView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -76,10 +101,7 @@ class ArticlesView(APIView):
         # Filter articles based on content relevance
         filtered_articles = [
             article for article in queryset
-            if article.content.strip() != 'No summary available' and
-            len(article.title.split()) > 2 and
-            article.media_url and
-            self.is_content_relevant(article)
+            if self.is_content_relevant(article)
         ]
 
         # Sort articles by creation date (newest first)
@@ -94,10 +116,19 @@ class ArticlesView(APIView):
         return paginator.get_paginated_response(serializer.data)
     
     def is_content_relevant(self, article):
+        # Check if the content is at least 50 characters long
+        if len(article.content.strip()) < 250:
+            return False
+
+        # Remove HTML entities and special characters
+        cleaned_content = re.sub(r'&[a-zA-Z0-9#]+;', '', article.content)  # Remove HTML entities
+        cleaned_content = re.sub(r'[^\w\s]', '', cleaned_content)  # Remove special characters
+
         # Example relevance check: content should include keywords from the title
         title_keywords = set(article.title.lower().split())
-        content_keywords = set(article.content.lower().split())
+        content_keywords = set(cleaned_content.lower().split())
         return any(keyword in content_keywords for keyword in title_keywords)
+
 
 class UserArticleViewCountView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -111,13 +142,11 @@ class BookmarksView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Retrieve all bookmarks for the authenticated user
         bookmarks = Bookmark.objects.filter(user=request.user)
         serializer = BookmarkSerializer(bookmarks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        # Add a new bookmark
         article_id = request.data.get('article_id')
         if not article_id:
             return Response({'error': 'Article ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -128,12 +157,12 @@ class BookmarksView(APIView):
             return Response({'error': 'Article not found'}, status=status.HTTP_404_NOT_FOUND)
 
         bookmark, created = Bookmark.objects.get_or_create(user=request.user, article=article)
-        if not created:
+        if created:
+            create_notification(request.user, f"You bookmarked the article: {article.title}")
+        else:
             return Response({'message': 'Article already bookmarked'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = BookmarkSerializer(bookmark)
-
-        # Remove the 'article' field from the serialized data
         bookmark_data = serializer.data
         if 'article' in bookmark_data:
             del bookmark_data['article']
@@ -145,7 +174,6 @@ class BookmarksView(APIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, article_id=None):
-        # Remove a bookmark
         if article_id is None:
             return Response({'error': 'Article ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -157,10 +185,10 @@ class BookmarksView(APIView):
         bookmark = Bookmark.objects.filter(user=request.user, article=article).first()
         if bookmark:
             bookmark.delete()
+            create_notification(request.user, f"You removed the bookmark for: {article.title}")
             return Response({'message': 'Bookmark removed'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error': 'Bookmark not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 class BookmarkCountView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -171,11 +199,6 @@ class BookmarkCountView(APIView):
         bookmark_count = Bookmark.objects.filter(user=request.user).count()
         return Response({'bookmark_count': bookmark_count}, status=status.HTTP_200_OK)
 
-class NotificationsView(APIView):
-    authentication_classes = [JWTAuthentication]
-
-    def get(self, request):
-        return Response({'message': 'Notifications list'})
 
 class CommentsView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -251,7 +274,11 @@ class RecommendedArticlesView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def is_content_relevant(self, article):
-        # Example relevance check: content should include keywords from the title
+    # Check if the content is at least 50 characters long
+        if len(article.content.strip()) < 250:
+            return False
+
+    # Example relevance check: content should include keywords from the title
         title_keywords = set(article.title.lower().split())
         content_keywords = set(article.content.lower().split())
         return any(keyword in content_keywords for keyword in title_keywords)
@@ -286,24 +313,16 @@ class TrendingArticlesView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def is_content_relevant(self, article):
-        # Example relevance check: content should include keywords from the title
+    # Check if the content is at least 50 characters long
+        if len(article.content.strip()) < 250 :
+            return False
+
+    # Example relevance check: content should include keywords from the title
         title_keywords = set(article.title.lower().split())
         content_keywords = set(article.content.lower().split())
         return any(keyword in content_keywords for keyword in title_keywords)
-from django.conf import settings
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-import requests
 
-# Import the dotenv library and load the environment variables
-from dotenv import load_dotenv
-import os
 
-# Load the .env file
-load_dotenv()
 class WeatherView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -318,18 +337,6 @@ class WeatherView(APIView):
         lat = request.query_params.get('lat')
         lon = request.query_params.get('lon')
         city = request.query_params.get('city')
-        z = request.query_params.get('z', 10)  # Default zoom level
-        x = request.query_params.get('x', 512)  # Default x coordinate
-        y = request.query_params.get('y', 386)  # Default y coordinate
-
-        # Define layers
-        layers = {
-    "Clouds": "clouds_new",
-    "Precipitation": "precipitation_new",
-    "Sea level pressure": "pressure_new",
-    "Wind speed": "wind_new",
-    "Temperature": "temp_new"
-}
 
         # Determine request parameters
         if lat and lon:
@@ -427,10 +434,6 @@ class WeatherView(APIView):
                 return Response({"error": air_pollution_data.get("message", "Failed to fetch air pollution data")},
                                 status=air_pollution_response.status_code)
 
-            # Generate URLs for all weather map layers
-            map_urls = {layer_name: f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
-            for layer_name, layer in layers.items()}
-
             # Extract relevant forecast data
             forecast_list = forecast_data["list"]
             filtered_forecast = []
@@ -441,7 +444,7 @@ class WeatherView(APIView):
                     "description": entry["weather"][0]["description"]
                 })
 
-            # Combine current weather, forecast, air pollution, and map URLs
+            # Combine current weather, forecast, and air pollution data
             weather_info = {
                 "current": {
                     "city": current_data["name"],
@@ -457,11 +460,67 @@ class WeatherView(APIView):
                 "air_pollution": {
                     "aqi": air_pollution_data["list"][0]["main"]["aqi"],
                     "components": air_pollution_data["list"][0]["components"]
-                },
-                "maps": map_urls
+                }
             }
 
             return Response(weather_info, status=status.HTTP_200_OK)
 
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class NotificationsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user).order_by('created_at')
+        
+        if not notifications.exists():
+            return Response({'message': 'No notifications found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Mark notifications as read
+        notifications.update(is_read=True)
+        
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, notification_id=None):
+        if notification_id is None:
+            return Response({'error': 'Notification ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            notification = Notification.objects.get(id=notification_id, user=request.user)
+            notification.delete()
+            return Response({'message': 'Notification deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Notification.DoesNotExist:
+            return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+def send_read_later_reminders():
+    for user in User.objects.all():
+        unread_bookmarks = Bookmark.objects.filter(user=user, is_read=False)
+        if unread_bookmarks.exists():
+            create_notification(user, f"You have {unread_bookmarks.count()} unread bookmarked articles. Don't forget to check them out!")
+
+def notify_article_update(article):
+    bookmarked_users = User.objects.filter(bookmarks__article=article)
+    for user in bookmarked_users:
+        create_notification(user, f"An article you bookmarked has been updated: {article.title}")
+
+def send_weekly_summary():
+    for user in User.objects.all():
+        article_views = UserArticleView.objects.filter(
+            user=user,
+            viewed_at__gte=timezone.now() - timedelta(days=7)
+        ).count()
+        new_bookmarks = Bookmark.objects.filter(
+            user=user,
+            created_at__gte=timezone.now() - timedelta(days=7)
+        ).count()
+        create_notification(user, f"Your weekly summary: You viewed {article_views} articles and created {new_bookmarks} new bookmarks.")
+
+
+def create_notification(user, message):
+    Notification.objects.create(user=user, message=message, is_read=False)

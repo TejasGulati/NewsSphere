@@ -1,0 +1,113 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    background-color: #FFF8F3;
+    background-image: url('../../assets/img.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  
+  .notifications-container {
+    max-width: 1200px;
+    margin: auto;
+    margin-top: 40px;
+    padding: 40px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background-color: #405D72;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  
+  .notifications-header h2 {
+    color: #FFF8F3;
+    font-size: 2.4rem;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  .notification-list {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .notification-item {
+    background: #FFF8F3;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .notification-item:hover {
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  .notification-content {
+    color: #405D72;
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+  
+  .delete-icon {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    background-color: #405D72;
+    padding: 5px;
+}
+
+.delete-icon:hover {
+    opacity: 0.7; /* Change the opacity on hover for better visual feedback */
+}
+  .no-notifications {
+    padding: 100px;
+    text-align: center;
+    font-size: 1.5em;
+    color: #FFF8F3;
+    margin-top: 7px;
+    margin-right: 5px;
+  }
+
+  .notification-link {
+    color: #405D72; /* Set your preferred color */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold;
+  }
+  
+  .notification-link:hover {
+    text-decoration: underline; /* Underline on hover */
+  }
+  

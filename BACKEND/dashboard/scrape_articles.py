@@ -39,48 +39,68 @@ WEBSITES = {
         'https://www.cnet.com/tech/',
         'https://www.techcrunch.com/',
         'https://www.wired.com/',
-        'https://www.engadget.com/',  # Added
-        'https://arstechnica.com/',  # Added
-        'https://www.zdnet.com/',  # Added
-        'https://www.tomsguide.com/',  # Added
-        'https://www.techradar.com/',  # Added
-        'https://www.gsmarena.com/',  # Added
+        'https://www.engadget.com/',
+        'https://arstechnica.com/',
+        'https://www.zdnet.com/',
+        'https://www.tomsguide.com/',
+        'https://www.techradar.com/',
+        'https://www.gsmarena.com/',
+        'https://www.bbc.com/news/technology',  # Added
+        'https://www.forbes.com/tech/',  # Added
+        'https://www.digitaltrends.com/',  # Added
+        'https://www.theinformation.com/',  # Added
+        'https://www.androidcentral.com/',  # Added
     ],
     'sports': [
         'https://www.espn.com/',
         'https://www.skysports.com/',
         'https://www.cbssports.com/',
         'https://www.foxsports.com/',
-        'https://www.sports.yahoo.com/',  # Added
-        'https://www.nbcsports.com/',  # Added
-        'https://www.sportingnews.com/',  # Added
-        'https://www.sportsillustrated.com/',  # Added
-        'https://www.bleacherreport.com/',  # Added
-        'https://www.marca.com/en/',  # Added
+        'https://www.sports.yahoo.com/',
+        'https://www.nbcsports.com/',
+        'https://www.sportingnews.com/',
+        'https://www.sportsillustrated.com/',
+        'https://www.bleacherreport.com/',
+        'https://www.marca.com/en/',
+        'https://www.sportsnet.ca/',  # Added
+        'https://www.theathletic.com/',  # Added
+        'https://www.football365.com/',  # Added
+        'https://www.goal.com/',  # Added
+        'https://www.livescore.com/',  # Added
     ],
     'entertainment': [
         'https://variety.com/',
         'https://www.ew.com/',
-        'https://www.hollywoodreporter.com/',  # Added
-        'https://www.billboard.com/',  # Added
-        'https://www.tmz.com/',  # Added
-        'https://www.etonline.com/',  # Added
-        'https://www.nme.com/',  # Added
-        'https://www.indiewire.com/',  # Added
-        'https://www.collider.com/',  # Added
-        'https://www.rollingstone.com/',  # Added
+        'https://www.hollywoodreporter.com/',
+        'https://www.billboard.com/',
+        'https://www.tmz.com/',
+        'https://www.etonline.com/',
+        'https://www.nme.com/',
+        'https://www.indiewire.com/',
+        'https://www.collider.com/',
+        'https://www.rollingstone.com/',
+        'https://www.vulture.com/',  # Added
+        'https://www.popsugar.com/entertainment',  # Added
+        'https://www.dailymail.co.uk/tvshowbiz/index.html',  # Added
+        'https://www.filmfare.com/',  # Added
+        'https://www.theplaylist.net/',  # Added
     ],
     'politics': [
         'https://www.politico.com/',
         'https://www.theguardian.com/us-news/us-politics',
         'https://www.bbc.com/news/politics',
         'https://www.aljazeera.com/politics/',
-        'https://www.cnn.com/politics/',  # Added
-        'https://www.nytimes.com/section/politics',  # Added
-        'https://www.washingtonpost.com/politics/',  # Added
-        'https://www.reuters.com/politics/',  # Added
-        'https://www.foxnews.com/politics',  # Added
-        'https://www.msnbc.com/',  # Added
+        'https://www.cnn.com/politics/',
+        'https://www.nytimes.com/section/politics',
+        'https://www.washingtonpost.com/politics/',
+        'https://www.reuters.com/politics/',
+        'https://www.foxnews.com/politics',
+        'https://www.msnbc.com/',
+        'https://www.nationalreview.com/',  # Added
+        'https://www.huffpost.com/politics',  # Added
+        'https://www.thedailybeast.com/',  # Added
+        'https://www.time.com/politics/',  # Added
+        'https://www.axios.com/politics',  # Added
     ],
     'science': [
         'https://www.scientificamerican.com/',
@@ -88,13 +108,19 @@ WEBSITES = {
         'https://www.livescience.com/',
         'https://www.space.com/',
         'https://www.discovermagazine.com/',
-        'https://www.newscientist.com/', 
-        'https://www.nationalgeographic.com/science/',  # Added
-        'https://www.smithsonianmag.com/science-nature/',  # Added
-        'https://www.popsci.com/',  # Added
-        'https://www.chemistryworld.com/',  # Added
+        'https://www.newscientist.com/',
+        'https://www.nationalgeographic.com/science/',
+        'https://www.smithsonianmag.com/science-nature/',
+        'https://www.popsci.com/',
+        'https://www.chemistryworld.com/',
+        'https://www.theatlantic.com/science/',  # Added
+        'https://www.sciencemag.org/',  # Added
+        'https://www.nature.com/',  # Added
+        'https://www.washingtonpost.com/science/',  # Added
+        'https://www.britannica.com/science',  # Added
     ]
 }
+
 
 
 MAX_ARTICLES_PER_CATEGORY = 250
@@ -174,37 +200,50 @@ def extract_summary(article_soup, title):
 
         # Remove specific metadata mentions and phrases
         metadata_patterns = [
-            r'Published By:.*',
-            r'Last Updated:.*',
-            r'Trending Desk.*',
-            r'Updated By:.*',
-            r'Writtend By:.*',
-            r'Updated on:.*',
-            r'Curated By:.*',
-            r'Created By:.*',
-            r'End-to-end encryption.*',
-            r'Privacy control.*',
-            r'Free* in calls.*',
-            r'^\w+ \d{1,2}:\d{2} (am|pm) IST.*',
-            r'Subscribe.*',
-            r'Enroll.*',
-            r'Join.*',
-            r'Sign Up.*',
-            r'Register.*',
-            r'Get Started.*',
-            r'Start Your Free Trial.*',
-            r'Free Access.*',
-            r'Advertisement.*',
-            r'Become a Member.*',
-            r'Unlimited Access.*',
-            r'MEDIANAMA.*',
-            r'\b\d{1,2} \w{3,9} \d{4}\b',
-            r'\b\d{1,2} min read\b',
-            r'\b\d{1,2} \w{3,9} \d{4}\b.*\b\d{1,2} min read\b',
-            r'UPDATE \(.*\)',
-            r'To revisit this article, visit My Profile, thenView saved stories',
-            r'By\s*\.{3,}',
-        ]
+    r'Published By:.*',
+    r'Last Updated:.*',
+    r'Trending Desk.*',
+    r'Updated By:.*',
+    r'Writtend By:.*',
+    r'Updated on:.*',
+    r'Curated By:.*',
+    r'Created By:.*',
+    r'End-to-end encryption.*',
+    r'Privacy control.*',
+    r'Free* in calls.*',
+    r'^\w+ \d{1,2}:\d{2} (am|pm) IST.*',
+    r'Subscribe.*',
+    r'Enroll.*',
+    r'Join.*',
+    r'Sign Up.*',
+    r'Register.*',
+    r'Get Started.*',
+    r'Start Your Free Trial.*',
+    r'Free Access.*',
+    r'Advertisement.*',
+    r'Become a Member.*',
+    r'Unlimited Access.*',
+    r'MEDIANAMA.*',
+    r'\b\d{1,2} \w{3,9} \d{4}\b',
+    r'\b\d{1,2} min read\b',
+    r'\b\d{1,2} \w{3,9} \d{4}\b.*\b\d{1,2} min read\b',
+    r'UPDATE \(.*\)',
+    r'To revisit this article, visit My Profile, thenView saved stories',
+    r'By\s*\.{3,}',
+    r'Deal.*',
+    r'Sale.*',
+    r'Buy.*',
+    r'Purchase.*',
+    r'Shopping.*',
+    r'Offer.*',
+    r'Discount.*',
+    r'Coupon.*',
+    r'Bargain.*',
+    r'Save.*',
+    r'Privacy Policy.*',
+    r'New Scientist.*',
+]
+
 
         for pattern in metadata_patterns:
             text_content = re.sub(pattern, '', text_content, flags=re.IGNORECASE)

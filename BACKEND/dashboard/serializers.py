@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from dashboard.models import Article, Bookmark
+from dashboard.models import Article, Bookmark, Notification
 
 class ArticleSerializer(serializers.ModelSerializer):
     is_bookmarked = serializers.SerializerMethodField()
@@ -24,4 +24,9 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bookmark
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
         fields = '__all__'

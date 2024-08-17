@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./notification.component.css">
+    <title>Notifications</title>
+</head>
+<body>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+    <div class="notifications-container">
+        <div class="notifications-header">
+          <h2>Notifications</h2>
+        </div>
+        <ng-container *ngIf="notifications.length > 0; else noNotifications">
+          <ul class="notification-list">
+            <li *ngFor="let notification of notifications" class="notification-item">
+              <div class="notification-content">
+                <ng-container *ngIf="notification.article_id; else noArticleLink">
+                  <a [routerLink]="['/article', notification.article_id]" class="notification-link">
+                    {{ notification.message }}
+                  </a>
+                </ng-container>
+                <ng-template #noArticleLink>
+                  {{ notification.message }}
+                </ng-template>
+                <ng-template #noArticleLink>
+                  {{ notification.message }}
+                </ng-template>
+              </div>
+              <img 
+                src="../../assets/del.png" 
+                alt="Delete" 
+                class="delete-icon"
+                (click)="deleteNotification(notification.id)"
+              />
+            </li>
+          </ul>
+        </ng-container>
+        <ng-template #noNotifications>
+          <p class="no-notifications">No notifications</p>
+        </ng-template>
+    </div>
+</body>
+</html>

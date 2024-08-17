@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'dashboard',
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -77,7 +78,7 @@ DATABASES = {
         'NAME': 'news_sphere',
         'USER': 'root',
         'PASSWORD': 'iamnoobokay',
-        'HOST': 'db',  # Change to 'db' for Docker
+        'HOST': 'localhost',  # Change to 'db' for Docker
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
@@ -158,10 +159,13 @@ import os
 CELERY_BEAT_SCHEDULE = {
     'scrape_articles': {
         'task': 'dashboard.tasks.scrape_articles',
-        'schedule': crontab(minute=0, hour='*/5'),  # Every 5 hours at the top of the hour
+        'schedule': crontab(minute=0, hour='*/5'),
+    },
+    'send-periodic-notifications': {
+        'task': 'dashboard.tasks.send_periodic_notifications',
+        'schedule': crontab(minute=0, hour=0, day_of_week='sunday'),
     },
 }
-
 
 
 # news_sphere/settings.py
@@ -180,3 +184,13 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 
 import news_sphere.celery
+
+ASGI_APPLICATION = 'news_sphere.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
+
+DOMAIN = 'http://127.0.0.1:8000/' 
+SITE_URL = 'http://127.0.0.1:8000/' 

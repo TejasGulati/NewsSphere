@@ -28,6 +28,14 @@ interface Article {
   expanded: boolean;
 }
 
+interface Notification {
+  id: number;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+  article_id?: number;
+}
+
 interface PaginatedResponse<T> {
   count: number;
   next: string | null;
@@ -40,7 +48,7 @@ interface PaginatedResponse<T> {
 })
 export class DashboardService {
   private apiUrl = 'http://127.0.0.1:8000';
-  private selectedCategorySubject = new BehaviorSubject<string>('');
+  private selectedCategorySubject = new BehaviorSubject('');
   selectedCategory$ = this.selectedCategorySubject.asObservable();
 
   constructor(private http: HttpClient, private authService: AuthService) {}
@@ -85,6 +93,20 @@ export class DashboardService {
     this.selectedCategorySubject.next(category);
   }
 
+  getNotifications(): Observable<Notification[]> {
+    return this.http.get<Notification[]>(`${this.apiUrl}/dashboard/notifications/`, { headers: this.getHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  
+
+  deleteNotification(notificationId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/dashboard/notifications/${notificationId}/`, { headers: this.getHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred!';
     if (error.error instanceof ErrorEvent) {
