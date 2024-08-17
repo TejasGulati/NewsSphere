@@ -77,7 +77,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'news_sphere',
         'USER': 'root',
-        'PASSWORD': 'iamnoobokay',
+        'PASSWORD': 'db',
         'HOST': 'localhost',  # Change to 'db' for Docker
         'PORT': '3306',
         'OPTIONS': {
